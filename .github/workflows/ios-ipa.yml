@@ -1,0 +1,78 @@
+name: AirTag Quest • iOS IPA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-ipa:
+    name: Build iOS • Simulator & IPA
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Check build tools
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        run: |
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+          xcodegen --version
+
+      - name: Generate pixel-art app icon
+        run: swift scripts/GenerateIcon.swift
+
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+
+      - name: Build iOS Simulator
+        run: |
+          xcodebuild -project AirTagQuest.xcodeproj \
+            -scheme AirTagQuest \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Build iPhone application
+        run: |
+          xcodebuild -project AirTagQuest.xcodeproj \
+            -scheme AirTagQuest \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package unsigned IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/Payload
+          cp -R build/Build/Products/Release-iphoneos/AirTagQuest.app out/Payload/
+          (cd out && zip -qry AirTagQuest-unsigned.ipa Payload)
+          ls -lh out/AirTagQuest-unsigned.ipa
+          unzip -t out/AirTagQuest-unsigned.ipa | tail -2
+
+      - name: Upload installable-after-signing IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: AirTagQuest-iOS-unsigned-IPA
+          path: out/AirTagQuest-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 30
