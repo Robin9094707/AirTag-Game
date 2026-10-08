@@ -61,12 +61,6 @@ struct Mission: Codable {
     var isEndless: Bool { stage > 30 }
     var bossAlive: Bool { enemies.contains(where: \.isBoss) }
     var portalReady: Bool { signals.isEmpty && !bossAlive }
-    var tileAt: (GridPoint) -> Int {
-        { p in
-            guard p.x >= 0, p.y >= 0, p.x < Self.width, p.y < Self.height else { return 1 }
-            return self.tiles[p.y * Self.width + p.x]
-        }
-    }
 }
 
 struct AdventureSave: Codable {
@@ -462,10 +456,10 @@ final class AdventureEngine: ObservableObject {
             }
         }
         if stage % 6 == 0 && stage <= 30 {
-            if let bossPoint = available.first(where: {
-                $0.distance(to: start) > 12 &&
-                !enemies.contains(where: { $0.location == $0 }) &&
-                $0 != finish
+            if let bossPoint = available.first(where: { point in
+                point.distance(to: start) > 12 &&
+                !enemies.contains(where: { enemy in enemy.location == point }) &&
+                point != finish
             }) {
                 enemies.append(SignalEnemy(location: bossPoint, health: 4 + stage / 12, isBoss: true))
             }
