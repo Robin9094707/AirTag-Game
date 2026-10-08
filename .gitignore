@@ -1,0 +1,9 @@
+# Generated Xcode files
+AirTagQuest.xcodeproj/
+build/
+out/
+DerivedData/
+*.xcuserstate
+.DS_Store
+# App icon is generated from Swift; no binary is committed.
+AirTagQuest/Assets.xcassets/AppIcon.appiconset/AppIcon.png
