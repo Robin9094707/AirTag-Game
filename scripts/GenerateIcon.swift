@@ -32,10 +32,12 @@ context.setFillColor(rgb(0.09, 0.17, 0.27))
 context.fillEllipse(in: CGRect(x: 330, y: 330, width: 364, height: 364))
 context.setStrokeColor(rgb(0.23, 0.92, 0.98))
 context.setLineWidth(34)
-context.strokeArc(center: CGPoint(x: 512, y: 512), radius: 106,
-                  startAngle: .pi * 0.28, endAngle: .pi * 0.72, clockwise: false)
-context.strokeArc(center: CGPoint(x: 512, y: 512), radius: 106,
-                  startAngle: .pi * 1.28, endAngle: .pi * 1.72, clockwise: false)
+context.addArc(center: CGPoint(x: 512, y: 512), radius: 106,
+               startAngle: .pi * 0.28, endAngle: .pi * 0.72, clockwise: false)
+context.strokePath()
+context.addArc(center: CGPoint(x: 512, y: 512), radius: 106,
+               startAngle: .pi * 1.28, endAngle: .pi * 1.72, clockwise: false)
+context.strokePath()
 context.setFillColor(rgb(0.30, 0.94, 1))
 context.fillEllipse(in: CGRect(x: 484, y: 484, width: 56, height: 56))
 guard let image = context.makeImage(),
