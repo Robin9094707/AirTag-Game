@@ -13,7 +13,7 @@ permissions:
 jobs:
   build-ipa:
     name: Build iOS • Simulator & IPA
-    runs-on: macos-latest
+    runs-on: macos-26-intel
     timeout-minutes: 45
     steps:
       - name: Check out source
